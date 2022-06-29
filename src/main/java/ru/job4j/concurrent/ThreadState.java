@@ -10,8 +10,9 @@ public class ThreadState {
         );
         first.start();
         second.start();
-        while (first.getState() != Thread.State.TERMINATED && second.getState() != Thread.State.TERMINATED) {
-            continue;
+        while (first.getState() != Thread.State.TERMINATED || second.getState() != Thread.State.TERMINATED) {
+            System.out.println(String.format("first: %s", first.getState()));
+            System.out.println(String.format("second: %s", second.getState()));
         }
         System.out.println("The work is completed");
     }
