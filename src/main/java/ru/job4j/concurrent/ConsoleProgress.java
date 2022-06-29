@@ -4,11 +4,11 @@ public class ConsoleProgress implements Runnable {
 
     @Override
     public void run() {
-        String[] sign = {"\\", "|", "/"};
+        String[] signs = {"\\", "|", "/"};
         try {
             while (!Thread.currentThread().isInterrupted()) {
-                for (int count = 0; count < 3; count++) {
-                    System.out.print("\rLoading... " + sign[count]);
+                for (var element : signs) {
+                    System.out.print("\rLoading... " + element);
                     Thread.sleep(500);
                 }
             }
