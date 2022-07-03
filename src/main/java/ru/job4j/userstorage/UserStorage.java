@@ -4,7 +4,6 @@ import net.jcip.annotations.GuardedBy;
 import net.jcip.annotations.ThreadSafe;
 
 import java.util.HashMap;
-import java.util.function.Predicate;
 
 @ThreadSafe
 public class UserStorage {
@@ -12,41 +11,25 @@ public class UserStorage {
     private final HashMap<Integer, User> store = new HashMap<>();
 
     public synchronized boolean add(User user) {
-        return putWithCondition(usr -> !store.containsKey(usr.getId()), user);
+        return store.putIfAbsent(user.getId(), user) == null;
     }
 
     public synchronized boolean update(User user) {
-        return putWithCondition(usr -> store.containsKey(usr.getId()), user);
-    }
-
-    private synchronized boolean putWithCondition(Predicate<User> condition, User user) {
-        boolean result = false;
-        if (condition.test(user)) {
-            store.put(user.getId(), user);
-            result = true;
-        }
-        return result;
+        return store.replace(user.getId(), user) != null;
     }
 
     public synchronized boolean delete(User user) {
-        boolean result = false;
-        if (store.containsKey(user.getId())) {
-            store.remove(user.getId());
-            result = true;
-        }
-        return result;
+        return store.remove(user.getId()) != null;
     }
 
     public synchronized boolean transfer(int fromId, int toId, int amount) {
         boolean result = false;
-        if (store.containsKey(fromId) && store.containsKey(toId)) {
-            User from = store.get(fromId);
-            User to = store.get(toId);
-            if (from.getAmount() >= amount) {
-                from.setAmount(from.getAmount() - amount);
-                to.setAmount(to.getAmount() + amount);
-                result = true;
-            }
+        User from = store.get(fromId);
+        User to = store.get(toId);
+        if (from != null && to != null && from.getAmount() >= amount) {
+            from.setAmount(from.getAmount() - amount);
+            to.setAmount(to.getAmount() + amount);
+            result = true;
         }
         return result;
     }
