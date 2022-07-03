@@ -14,7 +14,7 @@ public class SingleLockList<T extends Serializable> implements Iterable<T> {
     private final List<T> list;
 
     public SingleLockList(List<T> list) {
-        this.list = new ArrayList<>(list);
+        this.list = copy(list);
     }
 
     public synchronized void add(T value) {
@@ -27,6 +27,10 @@ public class SingleLockList<T extends Serializable> implements Iterable<T> {
 
     @Override
     public synchronized Iterator<T> iterator() {
-        return new ArrayList<>(list).iterator();
+        return copy(list).iterator();
+    }
+
+    private List<T> copy(List<T> list) {
+        return new ArrayList<>(list);
     }
 }
