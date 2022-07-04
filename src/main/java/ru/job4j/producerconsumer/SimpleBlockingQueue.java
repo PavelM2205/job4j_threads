@@ -32,4 +32,8 @@ public class SimpleBlockingQueue<T> {
         this.notify();
         return result;
     }
+
+    public synchronized int size() {
+        return queue.size();
+    }
 }

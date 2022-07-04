@@ -2,8 +2,9 @@ package ru.job4j.producerconsumer;
 
 import org.junit.Test;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -11,30 +12,27 @@ import static org.hamcrest.Matchers.*;
 public class SimpleBlockingQueueTest {
 
     @Test
-    public void whenAddFourNumbersAndConsumerStartsFirstThenMustBeSame()
-            throws InterruptedException {
-        SimpleBlockingQueue<Integer> queue = new SimpleBlockingQueue<>(4);
-        List<Integer> result = new ArrayList<>();
+    public void whenFetchAllThenThenGetIt() throws InterruptedException {
+        final CopyOnWriteArrayList<Integer> buffer = new CopyOnWriteArrayList<>();
+        final SimpleBlockingQueue<Integer> queue = new SimpleBlockingQueue<>(5);
         Thread producer = new Thread(
                 () -> {
-                    int i = 1;
                     try {
-                        while (i < 5) {
+                        for (int i = 0; i < 5; i++) {
                             queue.offer(i);
-                            i++;
                         }
                     } catch (InterruptedException exc) {
                         Thread.currentThread().interrupt();
                     }
+
                 }
         );
+        producer.start();
         Thread consumer = new Thread(
                 () -> {
-                    int i = 1;
                     try {
-                        while (i < 5) {
-                            result.add(queue.poll());
-                            i++;
+                        while ((queue.size() != 0) || !Thread.currentThread().isInterrupted()) {
+                            buffer.add(queue.poll());
                         }
                     } catch (InterruptedException exc) {
                         Thread.currentThread().interrupt();
@@ -42,23 +40,21 @@ public class SimpleBlockingQueueTest {
                 }
         );
         consumer.start();
-        producer.start();
-        consumer.join();
         producer.join();
-        assertThat(result, is(List.of(1, 2, 3, 4)));
+        consumer.interrupt();
+        consumer.join();
+        assertThat(buffer, is(Arrays.asList(0, 1, 2, 3, 4)));
     }
 
     @Test
-    public void whenAddMoreThanSizeThenMustBeSame() throws InterruptedException {
+    public void whenAddMoreThanQueSizeThenMustGetAll() throws InterruptedException {
+        CopyOnWriteArrayList<Integer> buffer = new CopyOnWriteArrayList<>();
         SimpleBlockingQueue<Integer> queue = new SimpleBlockingQueue<>(4);
-        List<Integer> result = new ArrayList<>();
         Thread producer = new Thread(
                 () -> {
-                    int i = 1;
                     try {
-                        while (i < 8) {
+                        for (int i = 0; i < 7; i++) {
                             queue.offer(i);
-                            i++;
                         }
                     } catch (InterruptedException exc) {
                         Thread.currentThread().interrupt();
@@ -67,21 +63,20 @@ public class SimpleBlockingQueueTest {
         );
         Thread consumer = new Thread(
                 () -> {
-                    int i = 1;
                     try {
-                        while (i < 8) {
-                            result.add(queue.poll());
-                            i++;
+                        while ((queue.size() != 0) || !Thread.currentThread().isInterrupted()) {
+                            buffer.add(queue.poll());
                         }
                     } catch (InterruptedException exc) {
                         Thread.currentThread().interrupt();
                     }
                 }
         );
-        consumer.start();
         producer.start();
-        consumer.join();
+        consumer.start();
         producer.join();
-        assertThat(result, is(List.of(1, 2, 3, 4, 5, 6, 7)));
+        consumer.interrupt();
+        consumer.join();
+        assertThat(buffer, is(List.of(0, 1, 2, 3, 4, 5, 6)));
     }
 }
