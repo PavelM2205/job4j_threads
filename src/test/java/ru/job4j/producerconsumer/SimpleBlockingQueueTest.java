@@ -18,18 +18,26 @@ public class SimpleBlockingQueueTest {
         Thread producer = new Thread(
                 () -> {
                     int i = 1;
-                    while (i < 5) {
-                        queue.offer(i);
-                        i++;
+                    try {
+                        while (i < 5) {
+                            queue.offer(i);
+                            i++;
+                        }
+                    } catch (InterruptedException exc) {
+                        Thread.currentThread().interrupt();
                     }
                 }
         );
         Thread consumer = new Thread(
                 () -> {
                     int i = 1;
-                    while (i < 5) {
-                        result.add(queue.poll());
-                        i++;
+                    try {
+                        while (i < 5) {
+                            result.add(queue.poll());
+                            i++;
+                        }
+                    } catch (InterruptedException exc) {
+                        Thread.currentThread().interrupt();
                     }
                 }
         );
@@ -47,18 +55,26 @@ public class SimpleBlockingQueueTest {
         Thread producer = new Thread(
                 () -> {
                     int i = 1;
-                    while (i < 8) {
-                        queue.offer(i);
-                        i++;
+                    try {
+                        while (i < 8) {
+                            queue.offer(i);
+                            i++;
+                        }
+                    } catch (InterruptedException exc) {
+                        Thread.currentThread().interrupt();
                     }
                 }
         );
         Thread consumer = new Thread(
                 () -> {
                     int i = 1;
-                    while (i < 8) {
-                        result.add(queue.poll());
-                        i++;
+                    try {
+                        while (i < 8) {
+                            result.add(queue.poll());
+                            i++;
+                        }
+                    } catch (InterruptedException exc) {
+                        Thread.currentThread().interrupt();
                     }
                 }
         );
