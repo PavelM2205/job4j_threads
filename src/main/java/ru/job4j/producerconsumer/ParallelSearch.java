@@ -21,7 +21,6 @@ public class ParallelSearch {
                             queue.offer(index);
                             Thread.sleep(500);
                         }
-                        consumer.interrupt();
                     } catch (InterruptedException exc) {
                         Thread.currentThread().interrupt();
                     }
@@ -30,6 +29,7 @@ public class ParallelSearch {
         consumer.start();
         producer.start();
         producer.join();
+        consumer.interrupt();
         consumer.join();
     }
 }
