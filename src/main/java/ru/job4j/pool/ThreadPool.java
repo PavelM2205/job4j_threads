@@ -16,12 +16,8 @@ public class ThreadPool {
         }
     }
 
-    public void work(Runnable job) {
-        try {
-            tasks.offer(job);
-        } catch (InterruptedException exc) {
-            Thread.currentThread().interrupt();
-        }
+    public void work(Runnable job) throws InterruptedException {
+        tasks.offer(job);
     }
 
     public void shutdown() {
@@ -55,9 +51,13 @@ public class ThreadPool {
         Runnable task1 = () -> System.out.println("task1");
         Runnable task2 = () -> System.out.println("task2");
         Runnable task3 = () -> System.out.println("task3");
-        pool.work(task1);
-        pool.work(task2);
-        pool.work(task3);
+        try {
+            pool.work(task1);
+            pool.work(task2);
+            pool.work(task3);
+        } catch (InterruptedException exc) {
+            Thread.currentThread().interrupt();
+        }
         pool.shutdown();
     }
 }
