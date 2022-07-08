@@ -1,11 +1,9 @@
 package ru.job4j.forkjoin;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveTask;
 
-public class Searcher<T> extends RecursiveTask<List<Integer>> {
+public class Searcher<T> extends RecursiveTask<Integer> {
     private static final int MIN_SIZE = 10;
     private final T[] massive;
     private final T target;
@@ -19,19 +17,20 @@ public class Searcher<T> extends RecursiveTask<List<Integer>> {
         this.target = target;
     }
 
-    public static <T> List<Integer> search(T[] mas, T target) {
+    public static <T> Integer search(T[] mas, T target) {
         Searcher<T> searcher = new Searcher<>(mas, 0, mas.length - 1, target);
         ForkJoinPool pool = ForkJoinPool.commonPool();
         return pool.invoke(searcher);
     }
 
     @Override
-    protected List<Integer> compute() {
-        List<Integer> result = new ArrayList<>();
+    protected Integer compute() {
+        Integer result = null;
         if ((to - from + 1) <= MIN_SIZE) {
             for (int i = from; i <= to; i++) {
                 if (target.equals(massive[i])) {
-                    result.add(i);
+                    result = i;
+                    break;
                 }
             }
             return result;
@@ -41,10 +40,14 @@ public class Searcher<T> extends RecursiveTask<List<Integer>> {
         Searcher<T> rightSearcher = new Searcher<>(massive, mid + 1, to, target);
         leftSearcher.fork();
         rightSearcher.fork();
-        List<Integer> left = leftSearcher.join();
-        List<Integer> right = rightSearcher.join();
-        result.addAll(left);
-        result.addAll(right);
+        Integer left = leftSearcher.join();
+        Integer right = rightSearcher.join();
+        if (left != null) {
+            result = left;
+        }
+        if (right != null) {
+            result = right;
+        }
         return result;
     }
 }
