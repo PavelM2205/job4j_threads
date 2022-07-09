@@ -27,11 +27,7 @@ public class Searcher<T> extends RecursiveTask<Integer> {
     protected Integer compute() {
         Integer result = -1;
         if ((to - from + 1) <= MIN_SIZE) {
-            for (int i = from; i <= to; i++) {
-                if (target.equals(massive[i])) {
-                    result = i;
-                }
-            }
+            result = lineSearch();
             return result;
         }
         int mid = (from + to) / 2;
@@ -42,6 +38,16 @@ public class Searcher<T> extends RecursiveTask<Integer> {
         Integer left = leftSearcher.join();
         Integer right = rightSearcher.join();
         return Math.max(left, right);
+    }
+
+    private Integer lineSearch() {
+        Integer result = -1;
+        for (int i = from; i <= to; i++) {
+            if (target.equals(massive[i])) {
+                result = i;
+            }
+        }
+        return result;
     }
 }
 

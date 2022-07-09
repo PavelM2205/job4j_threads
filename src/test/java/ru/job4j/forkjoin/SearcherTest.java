@@ -34,4 +34,11 @@ public class SearcherTest {
         Integer expected = -1;
         assertThat(Searcher.search(mas, 1), is(expected));
     }
+
+    @Test
+    public void whenMassiveHasAllMatchesThenMustBeLastIndex() {
+        Integer[] mas = {7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7};
+        Integer expected = 11;
+        assertThat(Searcher.search(mas, 7), is(11));
+    }
 }
