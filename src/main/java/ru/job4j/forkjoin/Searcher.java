@@ -25,12 +25,11 @@ public class Searcher<T> extends RecursiveTask<Integer> {
 
     @Override
     protected Integer compute() {
-        Integer result = null;
+        Integer result = -1;
         if ((to - from + 1) <= MIN_SIZE) {
             for (int i = from; i <= to; i++) {
                 if (target.equals(massive[i])) {
                     result = i;
-                    break;
                 }
             }
             return result;
@@ -42,13 +41,7 @@ public class Searcher<T> extends RecursiveTask<Integer> {
         rightSearcher.fork();
         Integer left = leftSearcher.join();
         Integer right = rightSearcher.join();
-        if (left != null) {
-            result = left;
-        }
-        if (right != null) {
-            result = right;
-        }
-        return result;
+        return Math.max(left, right);
     }
 }
 
