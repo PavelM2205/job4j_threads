@@ -10,23 +10,9 @@ public class RolColSum {
 
     public static Sums[] sum(int[][] matrix) {
         long start = System.currentTimeMillis();
-        int n = matrix.length;
-        Sums[] result = new Sums[n];
-        int rowSum = 0;
-        int colSum = 0;
-        for (int row = 0; row < n; row++) {
-            for (int column = 0; column < n; column++) {
-                rowSum += matrix[row][column];
-            }
-            result[row] = new Sums(rowSum, 0);
-            rowSum = 0;
-        }
-        for (int column = 0; column < n; column++) {
-            for (int row = 0; row < n; row++) {
-                colSum += matrix[row][column];
-            }
-            result[column].setColSum(colSum);
-            colSum = 0;
+        Sums[] result = new Sums[matrix.length];
+        for (int i = 0; i < matrix.length; i++) {
+            result[i] = computeSums(matrix, i);
         }
         System.out.println("Время работы синхронного метода: " + (System.currentTimeMillis() - start));
         return result;
@@ -48,19 +34,21 @@ public class RolColSum {
 
     private static CompletableFuture<Sums> getTask(int[][] matrix, int rowColumnNumber) {
         return CompletableFuture.supplyAsync(
-                () -> {
-                    int rowSum = 0;
-                    int colSum = 0;
-                    for (int column = 0; column < matrix.length; column++) {
-                        rowSum += matrix[rowColumnNumber][column];
-                    }
-
-                    for (int row = 0; row < matrix.length; row++) {
-                        colSum += matrix[row][rowColumnNumber];
-                    }
-                    return new Sums(rowSum, colSum);
-                }
+                () -> computeSums(matrix, rowColumnNumber)
         );
+    }
+
+    private static Sums computeSums(int[][] matrix, int rowColumnNumber) {
+        int rowSum = 0;
+        int colSum = 0;
+        for (int column = 0; column < matrix.length; column++) {
+            rowSum += matrix[rowColumnNumber][column];
+        }
+
+        for (int row = 0; row < matrix.length; row++) {
+            colSum += matrix[row][rowColumnNumber];
+        }
+        return new Sums(rowSum, colSum);
     }
 
     public static class Sums {
