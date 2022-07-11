@@ -41,12 +41,9 @@ public class RolColSum {
     private static Sums computeSums(int[][] matrix, int rowColumnNumber) {
         int rowSum = 0;
         int colSum = 0;
-        for (int column = 0; column < matrix.length; column++) {
-            rowSum += matrix[rowColumnNumber][column];
-        }
-
-        for (int row = 0; row < matrix.length; row++) {
-            colSum += matrix[row][rowColumnNumber];
+        for (int index = 0; index < matrix.length; index++) {
+            rowSum += matrix[rowColumnNumber][index];
+            colSum += matrix[index][rowColumnNumber];
         }
         return new Sums(rowSum, colSum);
     }
